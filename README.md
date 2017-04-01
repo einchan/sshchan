@@ -1,5 +1,11 @@
-sshchan
-=======
+# SSHCHAN
+The server software that runs einchan.god.jp
+Thanks to Chibi and all the original contributors!
+
+The original README.md is below but I think it's out of date. Just look through the code.
+PRs, cleanup & new features all welcome; I'm working very slowly n a total rewrite just for my own satisfaction so probably won't be making any major changes to this code any time soon.
+
+## sshchan
 
 A textboard environment implemented in Python. At the moment it is a script meant to be run server-side by a user connecting to that server using ssh. It hopes to be configurable and secure.
 
