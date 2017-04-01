@@ -1,0 +1,54 @@
+How to deploy sshchan safely:
+===
+
+1. Checkout sshchan from neetcode with git. Put the code into a suitable world-readable location.
+
+$ git clone http://neetco.de/chibi/sshchan.git sshchan
+$ mkdir [CODE DIR]
+$ mv sshchan/* [CODE DIR]
+ It's a good idea to keep your git directory and the running directory (where users will actually run the code from) separate.
+ For [CODE DIR], I suggest something like /usr/local/share/sshchan.
+
+2. Create a new group for the user account:
+
+$ groupadd [GROUP NAME]
+ e.g.
+$ groupadd anons
+
+3. Create a new user account in this group with a home directory where the chan is to be hosted:
+
+$ useradd -d [HOME DIR] -m -g [GROUP NAME] -N -c 'sshchan user' [USER NAME]
+ e.g.
+$ useradd -d /srv/sshchan -m -g anons -N -c 'sshchan user' anonymous
+
+4. Then, set the password.
+
+$ passwd [USER NAME]
+
+5. Add this line to the end of your /etc/ssh/sshd_config:
+
+	Match User anonymous
+	ForceCommand 'python3 /usr/local/share/sshchan/sshchan.py'
+
+ Change the 'anonymous' to your chosen username; and the path to sshchan.py to where you stored it.
+ Also make sure that your SSH server accepts password authentication (PasswordAuthentication yes)
+
+6. Set up sshchan as the anonymous user:
+
+$ su anonymous
+$ cd /usr/local/share/sshchan
+$ python3 setup.py
+
+ The init script will ask you for the root directory of the chan. Type in the home directory of the anonymous user.
+
+7. Make the first posts:
+
+ It's a good idea to make the first post on every board you create, because otherwise it shows up with a 404 error because the 
+ board index file is empty.
+
+That's it!
+
+TROUBLESHOOTING
+---------------
+
+To be completed.
