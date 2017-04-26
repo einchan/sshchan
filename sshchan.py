@@ -47,8 +47,8 @@ if __name__ == "__main__":
     marker = Marker()
     dl = DisplayLegacy(cfg, board, c, marker)
 
-    # Command line legacy interface
-    if cfg.display_legacy in ("True", "true"):
+    # Command line legacy interface - used by default
+    if cfg.display_legacy in ("True", "true"): 
         screen = DisplayLegacyCmdline(board, c, cfg, dl, marker)
         screen.run()
     # urwid GUI

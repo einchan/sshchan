@@ -26,7 +26,7 @@ display_legacy_helptext = \
 {"exit": ["exit | q | quit", "",  "Quits sshchan. Takes no arguments."],\
  "help": ["h | help", "[] | [command]", "Prints a help message."],\
  "cd": ["b | board | cd", "[board name]", "Displays the given board."],\
- "page": ["p | page", "", "Goes to the next page of display."],\
+ "page": ["p | page", "[page no.]", "Choose which page of a board to display."],\
  "view": ["v | view", "[thread/post no.]", "Displays a thread."],\
 \
  "re": ["re | reply", "[board name] | [[thread no.] [[text]]]",\

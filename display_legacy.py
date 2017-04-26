@@ -15,6 +15,8 @@ from sys import exit
 # Help texts and user guides
 import helptexts
 
+THREADSPERPAGE = 10 # TODO - Move to the conf file
+
 class DisplayLegacy:
 
     def __init__(self, config, board, c, marker):
@@ -31,7 +33,7 @@ class DisplayLegacy:
 
     def display_home(self):
         self.laprint(self.c.RED + 'Welcome to ' + self.c.YELLOW + 'sshchan!\
-\n===========' + self.c.RED + '========' + self.c.BLACK)
+            \n===========' + self.c.RED + '========' + self.c.BLACK)
         self.laprint(self.c.GREEN + 'SERVER:\t' + self.c.BLACK + self.config.server_name)
         self.laprint(self.c.GREEN + 'MOTD:' + self.c.BLACK)
         self.print_motd()
@@ -43,14 +45,14 @@ class DisplayLegacy:
 
     def laprint(self, *args, linestart='', end='\n', markup=False, line_limit=None):
         """Add the proper text to the buffer. Its companion function is layout()."""
+        
+        text = " ".join(args)
         if markup == True:
-            text = " ".join(args)
             text = self.marker.demarkify(text)
-        else:
-            text = " ".join(args)
 
         text_newline_splits = text.splitlines(keepends=True)
         text = ''
+        
         if type(line_limit) == int:
             for line in text_newline_splits[:line_limit]:
                 text += linestart + line
@@ -82,7 +84,7 @@ class DisplayLegacy:
             self.buf = self.buf[1:]
 #            if lines == self.config.tty_lines - 2:
 #                print(self.c.GREEN + "Page too long to display.", \
-#"Type 'page' and hit Enter to see the rest." + self.c.BLUE)
+#                   "Type 'page' and hit Enter to see the rest." + self.c.BLUE)
 #                lines += 1
 #                break
 
@@ -115,12 +117,12 @@ class DisplayLegacy:
         if cmd == None:
             for key in sorted(self.helptext.keys()):
                 print(self.c.GREEN + self.helptext[key][0] + self.c.YELLOW, \
-self.helptext[key][1] + "\n" + self.c.BLACK + self.helptext[key][2])
+                    self.helptext[key][1] + "\n" + self.c.BLACK + self.helptext[key][2])
             print(helptexts.markup_helptext)
         else:
             try:
                 print(self.c.GREEN + self.helptext[cmd][0] + self.c.YELLOW, \
-self.helptext[cmd][1] + "\n" + self.c.BLACK + self.helptext[cmd][2])
+                    self.helptext[cmd][1] + "\n" + self.c.BLACK + self.helptext[cmd][2])
             except KeyError:
                 print(self.c.RED + "Help for that command could not be found." + self.c.BLACK)
 
@@ -145,7 +147,7 @@ self.helptext[cmd][1] + "\n" + self.c.BLACK + self.helptext[cmd][2])
         else:
             return name
 
-    def display_board(self):
+    def display_board(self, page=1):
         """Displays the OPs of the threads on a board."""
         if self.board.name == '':
             print(self.c.RED + "You are not on a board." + self.c.BLACK)
@@ -158,14 +160,28 @@ self.helptext[cmd][1] + "\n" + self.c.BLACK + self.helptext[cmd][2])
             return False
 
         index = self.board.get_index()
-        for x in reversed(range(0, len(index))): # reversed() makes newest threads appear at the bottom.
+        
+        if type(THREADSPERPAGE) == int:
+            first_thread_to_display = (THREADSPERPAGE * page) - THREADSPERPAGE
+            last_thread_to_display = (THREADSPERPAGE * page)
+            if last_thread_to_display > len(index):
+                last_thread_to_display = len(index)
+                first_thread_to_display = len(index) - THREADSPERPAGE
+                if len(index) < THREADSPERPAGE:
+                    first_thread_to_display = 0
+        else:
+            first_thread_to_display = 0
+            last_thread_to_display = len(index)
+        
+        
+        for x in (range(first_thread_to_display, last_thread_to_display)): # reversed() makes newest threads appear at the bottom.
             thread = index[x]
             thread_id = thread[0]
             del thread
             self.display_thread(thread_id, index=index, op_only=True)
         self.layout()
 
-    def display_thread(self, thread_id, index=None, op_only=False, replies=300):
+    def display_thread(self, thread_id, index=None, op_only=False, replies=1000):
         """Displays a thread.
         thread_id is self-explanatory.
         index: the thread index. It is an argument to cut down on reading
@@ -195,8 +211,7 @@ self.helptext[cmd][1] + "\n" + self.c.BLACK + self.helptext[cmd][2])
             except IndexError:
                 break
 
-            # The old json format - just date, post_no and post_text
-            if len(reply) == 3:
+            if len(reply) == 3: # The old json format - just date, post_no and post_text
                 name = "Anonymous"
                 date = self.convert_time(int(reply[0]))
                 post_no = str(reply[1])
