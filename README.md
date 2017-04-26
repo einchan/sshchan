@@ -3,7 +3,7 @@ The server software that runs einchan.god.jp
 Thanks to Chibi and all the original contributors!
 
 The original README.md is below but I think it's out of date. Just look through the code.
-PRs, cleanup & new features all welcome; I'm working very slowly n a total rewrite just for my own satisfaction so probably won't be making any major changes to this code any time soon.
+PRs, cleanup & new features all welcome; I'm working very slowly on a total rewrite just for my own satisfaction so probably won't be making any major changes to this code any time soon.
 
 ## sshchan
 
