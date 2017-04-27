@@ -174,7 +174,7 @@ class DisplayLegacy:
             last_thread_to_display = len(index)
         
         
-        for x in (range(first_thread_to_display, last_thread_to_display)): # reversed() makes newest threads appear at the bottom.
+        for x in reversed(range(first_thread_to_display, last_thread_to_display)): # reversed() makes newest threads appear at the bottom.
             thread = index[x]
             thread_id = thread[0]
             del thread
