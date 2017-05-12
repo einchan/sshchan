@@ -5,6 +5,7 @@ Copyright (c) 2016
 chibi <http://neetco.de/chibi>, makos <https://github.com/makos/>
 under GNU GPL v2, see LICENSE for details
 """
+import math
 import os
 import re
 import string
@@ -160,19 +161,25 @@ class DisplayLegacy:
             return False
 
         index = self.board.get_index()
-        
-        if type(THREADSPERPAGE) == int:
+
+        # Pagination
+        hidden_pages = 0
+        threads_number = len(index)
+        last_page = 0
+        if type(THREADSPERPAGE) == int and THREADSPERPAGE != 0:
             first_thread_to_display = (THREADSPERPAGE * page) - THREADSPERPAGE
             last_thread_to_display = (THREADSPERPAGE * page)
-            if last_thread_to_display > len(index):
-                last_thread_to_display = len(index)
-                first_thread_to_display = len(index) - THREADSPERPAGE
-                if len(index) < THREADSPERPAGE:
+            if last_thread_to_display > threads_number: # Less than THREADPERPAGE threads on the board
+                last_thread_to_display = threads_number
+                first_thread_to_display = threads_number - THREADSPERPAGE
+                if threads_number < THREADSPERPAGE:
                     first_thread_to_display = 0
+            else:
+                last_page = math.ceil(threads_number / THREADSPERPAGE)
+                hidden_pages = last_page - page
         else:
             first_thread_to_display = 0
             last_thread_to_display = len(index)
-        
         
         for x in reversed(range(first_thread_to_display, last_thread_to_display)): # reversed() makes newest threads appear at the bottom.
             thread = index[x]
@@ -180,6 +187,12 @@ class DisplayLegacy:
             del thread
             self.display_thread(thread_id, index=index, op_only=True)
         self.layout()
+
+        if hidden_pages >= last_page:
+            print(self.c.RED + "No more pages to display")
+        elif hidden_pages > 0:
+            print(self.c.RED + str(hidden_pages) + " more pages, enter " + self.c.GREEN + "'p " + str((page + 1)) + "'" + self.c.RED + " to see the next page.")
+
 
     def display_thread(self, thread_id, index=None, op_only=False, replies=1000):
         """Displays a thread.
@@ -198,6 +211,7 @@ class DisplayLegacy:
         if thread_pos == -1: # -1 is the false return value for thread_exists()
             print(self.c.RED + 'Thread not found.' + self.c.BLACK)
             return False
+        
         else:
             thread = index[thread_pos]
 
@@ -205,7 +219,7 @@ class DisplayLegacy:
             replies = 3 
             post_line_limit = 5
 
-        for x in range(2, replies): # reversed() makes the newest posts appear at the bottom
+        for x in range(2, replies): # reversed() would the newest posts appear at the bottom
             try:
                 reply = thread[x]
             except IndexError:
