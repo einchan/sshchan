@@ -35,8 +35,7 @@ def parse_post(p):
 	return {"name":name, "time":time, "id_no":id_no, "body":body}
 
 
-def index_to_fs(json_in_folder, gopher_out_folder):
-	index_path = os.path.join(json_in_folder, "index")
+def index_to_fs(index_path, gopher_out_folder):
 	with open(index_path, 'r') as f:
 		buf = json.load(f)
 
@@ -56,8 +55,7 @@ def index_to_fs(json_in_folder, gopher_out_folder):
 			t.write(content)
 
 
-def build_board_root(json_in_folder, gopher_out_folder, board_name):
-	index_path = os.path.join(json_in_folder, "index")
+def build_board_root(index_path, gopher_out_folder, board_name):
 	with open(index_path) as f:
 		buf = json.load(f)
 	
@@ -70,13 +68,13 @@ def build_board_root(json_in_folder, gopher_out_folder, board_name):
 		op = parse_post(thread[2])
 		
 		content = content+"\n\n\n0"+subject+"\t/"+board_name+"/"+thread_id+"\t"+HOSTNAME+"\t"+PORT+"\n--------\n"
-		content = content + op["body"][:255] + "\n"
+		content = content +" "+ op["body"][:255] + "\n"
 		if len(thread) < 4:
-			break
+			continue
 		posts = thread[3:]
 		for p in posts[-3:]:
 			p = parse_post(p)
-			content = content + p["body"][:255] + "\n\n"
+			content = content + " " + p["body"][:255] + "\n\n"
 			
 	if not os.path.isdir(gopher_out_folder):
 		os.makedirs(gopher_out_folder)
@@ -86,10 +84,10 @@ def build_board_root(json_in_folder, gopher_out_folder, board_name):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print("No board name given!")
+		print("No path given!")
 		sys.exit()
 	else:
-		board_path = sys.argv[1]
-		board_name = os.path.basename(board_path)
-	index_to_fs(board_path, os.path.join(GOPHER_ROOT, board_name))
-	build_board_root(board_path, os.path.join(GOPHER_ROOT, board_name), board_name)
+		index_path = sys.argv[1]
+		board_name = index_path.split("/")[-2] # TODO: this seems fragile
+	index_to_fs(index_path, os.path.join(GOPHER_ROOT, board_name))
+	build_board_root(index_path, os.path.join(GOPHER_ROOT, board_name), board_name)
