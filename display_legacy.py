@@ -205,6 +205,7 @@ class DisplayLegacy:
             index = self.board.get_index()
 
         post_line_limit = None
+        lst = "    "
         # The index of the thread in the index file
         thread_pos = self.board.thread_exists(int(thread_id))
 
@@ -216,15 +217,17 @@ class DisplayLegacy:
             thread = index[thread_pos]
 
         if op_only == True:
-            replies = 3 
+            replies = 1
             post_line_limit = 5
+        
+        posts = [thread[2]] + thread[3:][-replies:]
+        
+        op = True # Used to prepend lines with lst
+        
+        # print the subject
+        self.laprint(self.c.RED + str(thread[1]) + self.c.BLACK)
 
-        for x in range(2, replies): # reversed() would the newest posts appear at the bottom
-            try:
-                reply = thread[x]
-            except IndexError:
-                break
-
+        for reply in posts: # reversed() would the newest posts appear at the bottom
             if len(reply) == 3: # The old json format - just date, post_no and post_text
                 name = "Anonymous"
                 date = self.convert_time(int(reply[0]))
@@ -235,22 +238,16 @@ class DisplayLegacy:
                 date = self.convert_time(int(reply[1]))
                 post_no = str(reply[2])
                 post_text = str(reply[3]).rstrip()
-
-            # If it is not the OP post, prepend two spaces to every line.
-            # Makes it look better. 
-            if x == 2:
-                lst = ''
-            else:
-                lst = '  '
-
+            
+            if not op:
+                lst = ""
+            
             self.laprint(self.c.YELLOW + name, end=' ', linestart=lst)
             self.laprint(self.c.GREEN + date + self.c.BLACK + ' No.' + post_no, end=' ')
-            # If it is the OP post, print the subject
-            if x == 2:
-                self.laprint(self.c.RED + str(thread[1]) + self.c.BLACK)
-            else:
-                self.laprint()
+            self.laprint()
             self.laprint(post_text, markup=True, line_limit=post_line_limit, linestart=lst)
+            
+            op = False
 
         if op_only == True:
             self.laprint(self.c.GREEN + str(len(thread) - 3), "replies \
