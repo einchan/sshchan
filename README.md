@@ -1,5 +1,5 @@
 # SSHCHAN
-The server software that runs einchan.god.jp
+The server software that runs [ein.blue](http://ein.blue).
 Thanks to Chibi and all the original contributors!
 
 The original README.md is below but I think it's out of date. Just look through the code.
